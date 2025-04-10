@@ -5,17 +5,35 @@ import CategorySelector from '@/components/CategorySelector';
 import ToneSelector from '@/components/ToneSelector';
 import ResultCard from '@/components/ResultCard';
 import LoadingOverlay from '@/components/LoadingOverlay';
-import { generateVideoContent, VideoContentResult } from '@/utils/aiGenerator';
+import { generateVideoContent, VideoContentResult, ContentLength } from '@/utils/aiGenerator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { MessageSquare, Hash, Tag, FileText, Youtube, Wand2 } from 'lucide-react';
+import { 
+  MessageSquare, 
+  Hash, 
+  Tag, 
+  FileText, 
+  Youtube, 
+  Wand2, 
+  Sparkles,
+  BarChart3,
+  ListPlus,
+  Lightbulb
+} from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ContentLengthSelector from '@/components/ContentLengthSelector';
+import KeywordSuggestions from '@/components/KeywordSuggestions';
+import SentimentAnalysis from '@/components/SentimentAnalysis';
+import TrendingContent from '@/components/TrendingContent';
+import AlternativeTitles from '@/components/AlternativeTitles';
 
 const Index = () => {
   const [topic, setTopic] = useState('');
   const [category, setCategory] = useState('tech');
   const [tone, setTone] = useState('professional');
+  const [contentLength, setContentLength] = useState<ContentLength>('medium');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<VideoContentResult | null>(null);
   const { toast } = useToast();
@@ -34,7 +52,7 @@ const Index = () => {
     
     try {
       setLoading(true);
-      const content = await generateVideoContent(topic, category, tone);
+      const content = await generateVideoContent(topic, category, tone, contentLength);
       setResults(content);
     } catch (error) {
       toast({
@@ -102,13 +120,23 @@ const Index = () => {
                 </div>
               </div>
               
+              <div>
+                <Label htmlFor="contentLength" className="mb-1.5 block">
+                  Content Length
+                </Label>
+                <ContentLengthSelector
+                  value={contentLength}
+                  onChange={setContentLength}
+                />
+              </div>
+              
               <Button 
                 type="submit" 
                 className="w-full bg-creator-gradient hover:opacity-90 transition-opacity"
                 disabled={loading || !topic.trim()}
               >
                 <Wand2 className="mr-2 h-4 w-4" />
-                Generate Content
+                Generate Enhanced Content
               </Button>
             </div>
           </form>
@@ -116,32 +144,55 @@ const Index = () => {
         
         {(results || loading) && (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold mb-4">Generated Content</h2>
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <Sparkles className="mr-2 h-5 w-5 text-creator-purple" />
+              AI-Generated Content
+            </h2>
             
-            <ResultCard
-              title="YouTube Title"
-              content={results?.title || ''}
-              icon={<Youtube size={16} />}
-            />
-            
-            <ResultCard
-              title="Hashtags"
-              content={results?.hashtags || ''}
-              icon={<Hash size={16} />}
-            />
-            
-            <ResultCard
-              title="SEO Tags"
-              content={results?.tags || ''}
-              icon={<Tag size={16} />}
-            />
-            
-            <ResultCard
-              title="Video Description"
-              content={results?.description || ''}
-              icon={<FileText size={16} />}
-              className="mb-8"
-            />
+            <Tabs defaultValue="essentials" className="w-full">
+              <TabsList className="w-full">
+                <TabsTrigger value="essentials" className="flex-1">Essentials</TabsTrigger>
+                <TabsTrigger value="advanced" className="flex-1">Advanced</TabsTrigger>
+                <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="essentials" className="space-y-4 mt-4">
+                <ResultCard
+                  title="YouTube Title"
+                  content={results?.title || ''}
+                  icon={<Youtube size={16} />}
+                />
+                
+                <ResultCard
+                  title="Hashtags"
+                  content={results?.hashtags || ''}
+                  icon={<Hash size={16} />}
+                />
+                
+                <ResultCard
+                  title="SEO Tags"
+                  content={results?.tags || ''}
+                  icon={<Tag size={16} />}
+                />
+                
+                <ResultCard
+                  title="Video Description"
+                  content={results?.description || ''}
+                  icon={<FileText size={16} />}
+                  className="mb-8"
+                />
+              </TabsContent>
+              
+              <TabsContent value="advanced" className="space-y-4 mt-4">
+                <AlternativeTitles titles={results?.titleAlternatives || []} />
+                <KeywordSuggestions keywords={results?.keywordSuggestions || []} />
+              </TabsContent>
+              
+              <TabsContent value="analytics" className="space-y-4 mt-4">
+                <SentimentAnalysis score={results?.sentimentScore || 0} />
+                <TrendingContent trends={results?.contentTrends || []} />
+              </TabsContent>
+            </Tabs>
           </div>
         )}
       </main>
