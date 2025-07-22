@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { Youtube, BarChart3, TrendUp, Users, PlaySquare, Clock } from 'lucide-react';
+import { Youtube, BarChart3, TrendingUp, Users, PlaySquare, Clock } from 'lucide-react';
 import { analyzeYoutubeChannel, ChannelAnalysisResult } from '@/utils/channelAnalyzer';
 
 const ChannelAnalysis = () => {
@@ -120,7 +120,7 @@ const ChannelAnalysis = () => {
           <Card>
             <CardHeader className="py-3 px-4 bg-secondary/50 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <TrendUp className="h-4 w-4 text-creator-purple" />
+                <TrendingUp className="h-4 w-4 text-creator-purple" />
                 Growth Potential
               </CardTitle>
             </CardHeader>
